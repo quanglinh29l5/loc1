@@ -1,0 +1,39 @@
+name: Build Production Website
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      PR_NUMBER: ${{ github.event.number }}
+      CYPRESS_BASE_URL: https://production-nextjs-ci-template-bavaan-platform.vercel.app/
+    steps:
+      if: github.event.pull_request.merged == true
+      - uses: actions/checkout@v2
+      - uses: amondnet/vercel-action@v20.0.0
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
+          github-token: ${{ secrets.GITHUB_TOKEN }} #Optional
+          vercel-args: '--prod' #Optional
+          vercel-org-id: ${{ secrets.ORG_ID}}  #Required
+          vercel-project-id: ${{ secrets.PROJECT_ID}} #Required 
+          working-directory: ./ #Your Working Directory, Optional
+          alias-domains: | #Optional
+            production-nextjs-ci-template-bavaan-platform.vercel.app
+      - uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+          headless: true
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: screenshots-in-headless-chrome
+          path: cypress/screenshots
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: video-in-headless-chrome
+          path: cypress/videos

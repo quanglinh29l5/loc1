@@ -1,0 +1,9 @@
+{
+  "name": "Bavaan Platform Storefront",
+  "version": 2,
+  "scope": "bavaan-platform",
+  "public": false,
+  "github": {
+    "silent": true
+  }
+}
